@@ -53,7 +53,7 @@ export const ar = {
   'more.reminders.noon': 'ظهراً',
   'more.reminders.evening': 'مساءً',
   'more.reminders.test': 'جرّب الآن',
-  'more.reminders.testAlert': 'تم ضبط تذكير تجريبي!',
+  'more.reminders.permissionDenied': 'الإشعارات محظورة. يرجى تفعيلها في إعدادات المتصفح لتلقي التذكيرات.',
   'more.reminders.speakTest': 'هذا اختبار للتذكير الصوتي.',
   'more.reminders.speakNotSupported': 'خاصية النطق غير مدعومة في متصفحك.',
   'more.display.title': 'إعدادات العرض',
@@ -61,6 +61,14 @@ export const ar = {
   'more.display.fontSize': 'حجم الخط',
   'more.display.textToSpeech': 'الاستماع إلى النص',
   'more.display.play': 'تشغيل',
+
+  // Notifications
+  'notification.test.title': 'تذكير تجريبي من سُكّري',
+  'notification.test.body': 'هذا اختبار للتأكد من إمكانية استقبال الإشعارات.',
+  'notification.body': 'حان وقت فحص مستوى السكر في الدم. الرجاء إضافة قراءة جديدة.',
+  'notification.titles.morning': 'صباح الخير! حان وقت الفحص.',
+  'notification.titles.noon': 'تذكير وقت الغداء',
+  'notification.titles.evening': 'مساء الخير! حان وقت الفحص.',
 
   // HistoryScreen
   'history.title': 'سجل القياسات',

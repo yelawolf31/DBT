@@ -53,7 +53,7 @@ export const en = {
   'more.reminders.noon': 'Noon',
   'more.reminders.evening': 'Evening',
   'more.reminders.test': 'Test Now',
-  'more.reminders.testAlert': 'Test reminder has been set!',
+  'more.reminders.permissionDenied': 'Notifications are blocked. Please enable them in your browser settings to receive reminders.',
   'more.reminders.speakTest': 'This is a test for the voice reminder.',
   'more.reminders.speakNotSupported': 'Speech synthesis is not supported in your browser.',
   'more.display.title': 'Display Settings',
@@ -61,6 +61,14 @@ export const en = {
   'more.display.fontSize': 'Font Size',
   'more.display.textToSpeech': 'Text-to-Speech',
   'more.display.play': 'Play',
+  
+  // Notifications
+  'notification.test.title': 'Sukkari Test Reminder',
+  'notification.test.body': 'This is a test to make sure you can receive notifications.',
+  'notification.body': "It's time to check your blood sugar level. Please add a new reading.",
+  'notification.titles.morning': 'Good Morning! Time for your check.',
+  'notification.titles.noon': 'Lunchtime Check-in',
+  'notification.titles.evening': 'Good Evening! Time for your check.',
 
   // HistoryScreen
   'history.title': 'Readings History',

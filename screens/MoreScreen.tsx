@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, Screen } from '../types';
 import { t, lang } from '../i18n';
 
@@ -29,23 +29,75 @@ interface MoreScreenProps {
   setActiveScreen: (screen: Screen) => void;
 }
 
-const SettingsCard: React.FC<{title: string, children: React.ReactNode}> = ({title, children}) => (
+const SettingsCard: React.FC<{title: string, children: React.ReactNode, footer?: React.ReactNode}> = ({title, children, footer}) => (
     <div className="bg-card/50 dark:bg-dark-card/50 p-5 rounded-2xl mb-6 shadow-soft dark:shadow-soft-dark">
         <h3 className="text-xl font-bold text-foreground dark:text-dark-foreground mb-4">{title}</h3>
         <div className="space-y-3">
             {children}
         </div>
+        {footer && <div className="mt-4">{footer}</div>}
     </div>
 );
 
 export const MoreScreen: React.FC<MoreScreenProps> = ({ settings, setSettings, setActiveScreen }) => {
+    const [permission, setPermission] = useState<NotificationPermission>('default');
+
+    useEffect(() => {
+        if ('Notification' in window) {
+            const updatePermissionStatus = () => setPermission(Notification.permission);
+            updatePermissionStatus(); // Check on mount
+            window.addEventListener('focus', updatePermissionStatus); // Check when tab is focused
+            return () => window.removeEventListener('focus', updatePermissionStatus);
+        }
+    }, []);
+
+    const requestNotificationPermission = async () => {
+        if (!('Notification' in window)) {
+            console.error('This browser does not support desktop notification');
+            return 'denied';
+        }
+        const result = await Notification.requestPermission();
+        setPermission(result);
+        return result;
+    };
+    
     const handleSettingChange = <K extends keyof Settings,>(key: K, value: Settings[K]) => {
         setSettings(prev => ({...prev, [key]: value}));
     }
 
-    const handleReminderChange = (key: 'morning' | 'noon' | 'evening', value: boolean) => {
-        setSettings(prev => ({...prev, reminders: {...prev.reminders, [key]: value}}));
+    const handleReminderChange = async (key: 'morning' | 'noon' | 'evening', value: boolean) => {
+        if (value) { // Turning reminder ON
+            let currentPermission = Notification.permission;
+            if (currentPermission === 'default') {
+                currentPermission = await requestNotificationPermission();
+            }
+
+            if (currentPermission === 'granted') {
+                 setSettings(prev => ({...prev, reminders: {...prev.reminders, [key]: value}}));
+            } else {
+                // Ensure UI reflects actual permission status if it's denied or ignored.
+                setPermission(currentPermission);
+            }
+        } else { // Turning reminder OFF
+             setSettings(prev => ({...prev, reminders: {...prev.reminders, [key]: value}}));
+        }
     }
+    
+    const testNotification = async () => {
+        let currentPermission = Notification.permission;
+        if (currentPermission === 'default') {
+            currentPermission = await requestNotificationPermission();
+        }
+        
+        // Ensure component state is synced with the actual browser permission
+        setPermission(currentPermission);
+
+        if (currentPermission === 'granted') {
+            new Notification(t('notification.test.title'), { body: t('notification.test.body') });
+        } else {
+            alert(t('more.reminders.permissionDenied'));
+        }
+    };
 
     const speakTest = () => {
         if ('speechSynthesis' in window) {
@@ -57,16 +109,20 @@ export const MoreScreen: React.FC<MoreScreenProps> = ({ settings, setSettings, s
         }
     }
 
+    const reminderFooter = permission === 'denied' ? (
+        <p className="text-sm text-danger text-center px-2">{t('more.reminders.permissionDenied')}</p>
+    ) : null;
+
     return (
         <div className="p-6 pb-32 min-h-screen">
             <h2 className="text-5xl font-black text-foreground dark:text-dark-foreground mb-8">{t('more.title')}</h2>
 
-            <SettingsCard title={t('more.reminders.title')}>
+            <SettingsCard title={t('more.reminders.title')} footer={reminderFooter}>
                 <Toggle label={t('more.reminders.morning')} enabled={settings.reminders.morning} onChange={(val) => handleReminderChange('morning', val)} />
                 <Toggle label={t('more.reminders.noon')} enabled={settings.reminders.noon} onChange={(val) => handleReminderChange('noon', val)} />
                 <Toggle label={t('more.reminders.evening')} enabled={settings.reminders.evening} onChange={(val) => handleReminderChange('evening', val)} />
                 <button 
-                  onClick={() => alert(t('more.reminders.testAlert'))}
+                  onClick={testNotification}
                   className="w-full mt-2 text-center font-bold text-primary dark:text-primary-dark hover:underline p-2 rounded-lg transition-colors hover:bg-primary/10">
                   {t('more.reminders.test')}
                 </button>
